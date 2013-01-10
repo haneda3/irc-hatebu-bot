@@ -1,7 +1,3 @@
-host: 
-username: 
-password: 
-
 oauth:
   consumer_key: 
   consumer_secret: 

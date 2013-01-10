@@ -5,14 +5,8 @@ server:
   user: __hatebubot__
   real: 
 
-channel_default:
-  - &channel_default
-
 channels:
-   - <<: *channel_default
-     name: test
-
-   - <<: *channel_default
-     name: test2
+   - name: test
+   - name: test2
 
 

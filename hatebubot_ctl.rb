@@ -14,8 +14,6 @@ $irc_setting = YAML::load_file($irc_setting_path)
 $server = $irc_setting['server']
 $channels = $irc_setting['channels']
 
-p $hatebu_setting
-
 def run
   hb = HatebuBot.new($server['host'], $server['port'],
     {:nick => $server['nick'], :user => $server['user'], :real => $server['real']})

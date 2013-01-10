@@ -1,0 +1,18 @@
+server:
+  host: 
+  port: 6667
+  nick: __hatebubot__
+  user: __hatebubot__
+  real: 
+
+channel_default:
+  - &channel_default
+
+channels:
+   - <<: *channel_default
+     name: test
+
+   - <<: *channel_default
+     name: test2
+
+

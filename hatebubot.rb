@@ -45,7 +45,7 @@ class HatebuBot < Net::IRC::Client
     end
 
     ch = m.params[0];
-    msg = m.params[1];
+    msg = m.params[1].force_encoding('utf-8');
 
     url = parseUrl(msg)
     if url == nil

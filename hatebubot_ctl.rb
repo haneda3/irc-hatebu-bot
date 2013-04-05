@@ -18,6 +18,7 @@ def run
   hb = HatebuBot.new($server['host'], $server['port'],
     {:nick => $server['nick'], :user => $server['user'], :real => $server['real']})
   hb.hatebu_setting = $hatebu_setting
+  hb.bot_name = $server["nick"]
   hb.channels = $irc_setting["channels"]
   hb.start
 end

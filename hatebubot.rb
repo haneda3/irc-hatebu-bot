@@ -19,6 +19,10 @@ class HatebuBot < Net::IRC::Client
     super
   end
 
+  def bot_name= (bot_name)
+    @bot_name = bot_name
+  end
+
   def hatebu_setting= (hatebu_setting)
     @hatebu_setting = hatebu_setting
   end
@@ -46,6 +50,20 @@ class HatebuBot < Net::IRC::Client
 
     ch = m.params[0];
     msg = m.params[1].force_encoding('utf-8');
+
+    bot_name = @bot_name
+    if msg =~ /.*#{bot_name}.+help.*/ then
+      post NOTICE, ch, "help"
+      return
+    end
+
+    if msg =~ /.*#{bot_name}.+ngword.*/ then
+      # show hatebu ngword
+      @hatebu_setting['ngword'].each do |word|
+        post NOTICE, ch, word
+      end
+      return
+    end
 
     url, title = parseUrl(msg)
     if url == nil

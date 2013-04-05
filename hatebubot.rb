@@ -30,7 +30,7 @@ class HatebuBot < Net::IRC::Client
   # 初回接続時
   def on_rpl_welcome(m)
     @channels.each do |channel|
-      post JOIN, "##{channel["name"]}"
+      post JOIN, "##{channel["name"]}", channel["password"]
     end
   end
 
@@ -47,34 +47,34 @@ class HatebuBot < Net::IRC::Client
     ch = m.params[0];
     msg = m.params[1].force_encoding('utf-8');
 
-    url = parseUrl(msg)
+    url, title = parseUrl(msg)
     if url == nil
+      return
+    end
+
+    post NOTICE, ch, TITLE_MSG + " " + title
+
+    # はてブ禁止だったら抜ける
+    if msg =~ /.*!.*/ then
+      p ERROR_HATEBUNG_MSG
+      return
+    end
+
+    # NGワードだったら抜ける
+    if exist_ngword?(@hatebu_setting['ngword'], msg) then
+      p ERROR_NGWORD_MSG
       return
     end
 
     # はてブする
     success, link = Hatebu.post(@hatebu_setting["oauth"], url)
     if success then
-      #s.post_comment(message['channel_name'], SUCCESS_MSG + " " + link)
       post NOTICE, ch, SUCCESS_MSG + " " + link
     end
   end
 
   def parseUrl(message)
     mes = message.tr('　', ' ') # 全角スペース撲滅
-
-    # はてブ禁止だったら抜ける
-    if mes =~ /.*!.*/ then
-      p ERROR_HATEBUNG_MSG
-      return nil
-    end
-
-    # NGワードだったら抜ける
-    if exist_ngword?(@hatebu_setting['ngword'], message) then
-      p ERROR_NGWORD_MSG
-      #s.post_comment(message['channel_name'], ERROR_NGWORD_MSG)
-      return nil
-    end
 
     if mes =~ /((http|https):\/\/\S+)\s*/ then
       url = URI.encode($1)
@@ -84,25 +84,24 @@ class HatebuBot < Net::IRC::Client
         # IPアドレスだったら抜ける
         IPAddr.new(host)
         p ERROR_IPADDR_MSG
-        #s.post_comment(message['channel_name'], ERROR_IPADDR_MSG)
         return nil
       rescue ArgumentError
       end
 
       # 取得できないサイトだったら抜ける
+      title = ""
       begin
         p url
         agent = Mechanize.new
         agent.get(url)
         p agent.page.title
-        #s.post_comment(message['channel_name'], TITLE_MSG + " " + agent.page.title)
+        title = agent.page.title
       rescue
         p ERROR_SITE_MSG
-        #s.post_comment(message['channel_name'], ERROR_SITE_MSG)
         return nil
       end
 
-      return url
+      return url, title
     end
   end
 
